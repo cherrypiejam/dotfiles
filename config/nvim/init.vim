@@ -129,7 +129,8 @@ Plug 'wsdjeg/vim-fetch'
 
 " Git
 Plug 'airblade/vim-gitgutter'
-let g:gitgutter_enabled = 0
+" let g:gitgutter_enabled = 0
+let g:gitgutter_map_keys = 0
 Plug 'tpope/vim-fugitive'
 
 " Tmux
@@ -162,8 +163,10 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 Plug 'scrooloose/nerdcommenter'
 nnoremap <leader><space> :call nerdcommenter#Comment(0, "toggle")<CR>
 vnoremap <leader><space> :call nerdcommenter#Comment(0, "toggle")<CR>gv
-let g:NERDSpaceDelims = 1
+let g:NERDSpaceDelims            = 1
 let g:NERDTrimTrailingWhitespace = 1
+let g:NERDToggleCheckAllLines    = 1
+let g:NERDCreateDefaultMappings  = 0 " No default key mapping
 
 " Auto closing
 Plug 'jiangmiao/auto-pairs'
@@ -197,8 +200,12 @@ Plug 'vim-scripts/loremipsum'
 " Replace text
 Plug 'vim-scripts/greplace.vim'
 
+" Code highlighting
+if has('nvim')
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+endif
 
-" LSP server
+" LSP support
 if has('nvim')
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -242,8 +249,7 @@ func! Cj()
     else
         " https://stackoverflow.com/a/18547013
         " It's essential to use the (remapping) :normal
-        lua vim.lsp.diagnostic.goto_next({enable_popup=false})
-        " exe "norm \<Plug>(ale_next_wrap)"
+        lua vim.diagnostic.goto_next({float = {border = "single"}})
     endif
 endfunction
 
@@ -260,9 +266,7 @@ func! Ck()
     elseif &spell
         norm! [s
     else
-        lua vim.lsp.diagnostic.goto_prev({enable_popup=false})
-        " lua vim.diagnostic.show({enable_popup=false})
-        " exe "norm \<Plug>(ale_previous_wrap)"
+        lua vim.diagnostic.goto_prev({float = {border = "single"}})
     endif
 endfunction
 
@@ -276,7 +280,6 @@ let g:rooter_patterns = ['.git', '_darcs', '.hg', '.bzr', '.svn']
 
 " Fuzzy finder
 " Plug '/usr/local/opt/fzf'
-" Plug 'junegunn/fzf'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Making sure to have latest binary
 Plug 'junegunn/fzf.vim'
 Plug 'ojroques/nvim-lspfuzzy'
@@ -285,14 +288,14 @@ let g:fzf_tags_command = 'ctags -R --languages=c,c++'
 
 " Files
 map <leader>p    :Files<CR>
-map <C-p>        :GFiles<CR>
+" map <C-p>        :GFiles<CR>
 nmap <leader>b   :Buffers<CR>
 " Workaround to have this trailing space in command
 nmap <leader>f   :Rg  <BS>
 xmap <leader>f   y:Rg <C-R>=escape(@",'/\')<CR>
 nmap <leader>m   :Marks<CR>
-nmap <leader>r   :Tags<CR>
-nmap <leader>kr  :BTags<CR>
+" nmap <leader>r   :Tags<CR>
+" nmap <leader>kr  :BTags<CR>
 
 
 call plug#end()
@@ -335,51 +338,15 @@ lua << EOF
         fzf_trim = true,         -- trim FZF entries
     }
 
----- Use an on_attach function to only map the following keys
----- after the language server attaches to the current buffer
---local on_attach = function(client, bufnr)
---  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
---  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
---
---  -- Enable completion triggered by <c-x><c-o>
---  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
---
---  -- Mappings.
---  local opts = { noremap=true, silent=true }
---
---  -- See `:help vim.lsp.*` for documentation on any of the below functions
---  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
---  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
---  buf_set_keymap('n', '<C-w>d', '<C-w>v<cmd>lua vim.lsp.buf.definition()<CR>', opts)
---  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
---  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
---  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
---  buf_set_keymap('n', '<leader>R', '<cmd>lua vim.lsp.buf.workspace_symbol()<CR>', opts)
---  -- buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
---  -- buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
---  -- buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
---  -- buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
---  -- buf_set_keymap('n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
---  -- buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
---  buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
---  -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
---  buf_set_keymap('n', '<leader>K', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
---  -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
---  -- buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
---  buf_set_keymap('n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
---  -- buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
---
---  --nvim_complete.on_attach()
---
---end
-
     -- Mappings.
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions
     -- local opts = { noremap=true, silent=true, popup_opts = { border = "single" } }
     local opts = { noremap=true, silent=true }
-    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    -- vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+    -- vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    -- vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next({float = {border = border}})<CR>', {})
+    -- vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float(0, { scope = "line", border = "single" })<CR>', {})
     vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
 
     -- Use an on_attach function to only map the followingnkeys
@@ -390,20 +357,9 @@ lua << EOF
 
         -- Show border
         vim.lsp.handlers["textDocument/hover"] =
-            vim.lsp.with(
-                vim.lsp.handlers.hover,
-                {
-                    -- border = "rounded"
-                    border = "single"
-                }
-            )
+            vim.lsp.with(vim.lsp.handlers.hover, { border = "single" })
         vim.lsp.handlers["textDocument/signatureHelp"] =
-            vim.lsp.with(
-                vim.lsp.handlers.signature_help,
-                {
-                    border = "single"
-                }
-            )
+            vim.lsp.with(vim.lsp.handlers.signature_help, { border = "single" })
 
         -- Mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
@@ -412,23 +368,21 @@ lua << EOF
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
         vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
         -- vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-        vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-        vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-        vim.keymap.set('n', '<leader>wl', function()
-            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, bufopts)
+        -- vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+        -- vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        -- vim.keymap.set('n', '<leader>wl', function()
+        --     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        -- end, bufopts)
         vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
         vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
         vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
         -- vim.keymap.set('n', '<leader>f', vim.lsp.buf.formatting, bufopts)
     end
 
     -- Signs
     local signs = { Error = "✖ ", Warning = "⚠ ", Hint = "i ", Information = "i " }
-    -- local signs = { Error = "✗ ", Warning = "! ", Hint = "i ", Information = "i " }
-
     for type, icon in pairs(signs) do
         local hl = "LspDiagnosticsSign" .. type
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
@@ -449,7 +403,7 @@ lua << EOF
         },
         window = {
             -- completion = cmp.config.window.bordered(),
-            -- documentation = cmp.config.window.bordered(),
+            documentation = cmp.config.window.bordered(),
         },
         mapping = cmp.mapping.preset.insert({
             ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -497,10 +451,7 @@ lua << EOF
 
     -- Setup lspconfig.
     local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-    -- require('lspconfig')['YOUR_LSP_SERVER'].setup {
-    --     capabilities = capabilities
-    -- }
-    local servers = { 'clangd', 'rust_analyzer' }
+    local servers = { 'clangd', 'rust_analyzer', 'pyright' }
     for _, lsp in ipairs(servers) do
         nvim_lsp[lsp].setup {
             capabilities = capabilities,
@@ -510,9 +461,36 @@ lua << EOF
             }
         }
     end
+
+    require'nvim-treesitter.configs'.setup {
+        -- A list of parser names, or "all"
+        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml"},
+
+        -- Install parsers synchronously (only applied to `ensure_installed`)
+        sync_install = false,
+
+        -- List of parsers to ignore installing (for "all")
+        -- ignore_install = { "javascript" },
+
+        highlight = {
+            -- `false` will disable the whole extension
+            enable = true,
+
+            -- list of language that will be disabled
+            -- disable = { "c", "rust" },
+
+            -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+            -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+            additional_vim_regex_highlighting = false,
+        },
+    }
+
 EOF
 
 endif
+
+" set foldmethod=expr
+" set foldexpr=nvim_treesitter#foldexpr()
 
 " Keyboard shortcuts
 " Moving around
@@ -567,7 +545,7 @@ tnoremap <Esc> <C-\><C-n>
 " tnoremap <M-Tab> <C-\><C-n>:bnext<CR>
 
 " Others
-inoremap jj <ESC>
+" inoremap jj <ESC>
 inoremap <C-s> <Esc>:w<CR>
 nnoremap <C-s> :w<CR>
 " Don't copy the contents of an overwritten selection.
@@ -647,9 +625,6 @@ autocmd BufNewFile *.{h,hpp} call <SID>insert_gates()
 " noremap <leader>bg :call ToggleBG()<CR>
 
 
-" plugin settings
-" let g:ctrlp_match_window = 'order:ttb,max:20'
-
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
 if executable('ag')
   " Use Ag over Grep
@@ -664,14 +639,7 @@ autocmd BufRead,BufNewFile *.fdoc set filetype=yaml
 " md is markdown
 autocmd BufRead,BufNewFile *.md set filetype=markdown
 autocmd BufRead,BufNewFile *.md set spell
-" extra rails.vim help
-" autocmd User Rails silent! Rnavcommand decorator      app/decorators            -glob=**/* -suffix=_decorator.rb
-" autocmd User Rails silent! Rnavcommand observer       app/observers             -glob=**/* -suffix=_observer.rb
-" autocmd User Rails silent! Rnavcommand feature        features                  -glob=**/* -suffix=.feature
-" autocmd User Rails silent! Rnavcommand job            app/jobs                  -glob=**/* -suffix=_job.rb
-" autocmd User Rails silent! Rnavcommand mediator       app/mediators             -glob=**/* -suffix=_mediator.rb
-" autocmd User Rails silent! Rnavcommand stepdefinition features/step_definitions -glob=**/* -suffix=_steps.rb
-" automatically rebalance windows on vim resize
+" Automatically rebalance windows on vim resize
 autocmd VimResized * :wincmd =
 
 " Fix Cursor in TMUX
@@ -692,32 +660,6 @@ if has("autocmd")
 endif
 
 
-" gui settings
-"if (&t_Co == 256 || has('gui_running'))
-"  if ($TERM_PROGRAM == 'iTerm.app')
-"    colorscheme solarized
-"  else
-"    colorscheme desert
-"  endif
-"endif
-
-" Disambiguate ,a & ,t from the Align plugin, making them fast again.
-"
-" This section is here to prevent AlignMaps from adding a bunch of mappings
-" that interfere with the very-common ,a and ,t mappings. This will get run
-" at every startup to remove the AlignMaps for the *next* vim startup.
-"
-" If you do want the AlignMaps mappings, remove this section, remove
-" ~/.vim/bundle/Align, and re-run rake in maximum-awesome.
-" function! s:RemoveConflictingAlignMaps()
-  " if exists("g:loaded_AlignMapsPlugin")
-    " AlignMapsClean
-  " endif
-" endfunction
-" command! -nargs=0 RemoveConflictingAlignMaps call s:RemoveConflictingAlignMaps()
-" silent! autocmd VimEnter * RemoveConflictingAlignMaps
-
-
 " Fix cursor type in Kitty
 let &t_SI = "\<Esc>[6 q"
 let &t_SR = "\<Esc>[4 q"
@@ -728,39 +670,9 @@ let &t_EI = "\<Esc>[2 q"
 " highlight Pmenu term=reverse ctermbg=255 guisp=LightMagenta
 " highlight Pmenu ctermbg=255 guisp=LightMagenta
 
-
 " Vim snip config
-" imap <expr> <C-j> '<Plug>(vsnip-expand-or-jump)'
-" smap <expr> <C-j> '<Plug>(vsnip-expand-or-jump)'
-
-" Jump forward or backward
-" imap <expr> <Tab>   '<Plug>(vsnip-jump-next)'
-" smap <expr> <Tab>   '<Plug>(vsnip-jump-next)'
-" imap <expr> <S-Tab> '<Plug>(vsnip-jump-prev)'
-" smap <expr> <S-Tab> '<Plug>(vsnip-jump-prev)'
-
-" Expand
-" imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
-" smap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
-
-" Expand or jump
-" imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
-" smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
-
-" Jump forward or backward
-" imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-" smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+" jump prev may cause vim hung :(
 " imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 " smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-
-" Select or cut text to use as $TM_SELECTED_TEXT in the next snippet.
-" See https://github.com/hrsh7th/vim-vsnip/pull/50
-" nmap        s   <Plug>(vsnip-select-text)
-" xmap        s   <Plug>(vsnip-select-text)
-" nmap        S   <Plug>(vsnip-cut-text)
-" xmap        S   <Plug>(vsnip-cut-text)
-
-" If you want to use snippet for multiple filetypes, you can `g:vsnip_filetypes` for it.
-" let g:vsnip_filetypes = {}
-" let g:vsnip_filetypes.javascriptreact = ['javascript']
-" let g:vsnip_filetypes.typescriptreact = ['typescript']
