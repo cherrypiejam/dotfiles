@@ -289,7 +289,7 @@ let g:fzf_tags_command = 'ctags -R --languages=c,c++'
 " Files
 map <leader>p    :Files<CR>
 " map <C-p>        :GFiles<CR>
-nmap <leader>b   :Buffers<CR>
+nmap <leader>bb  :Buffers<CR>
 " Workaround to have this trailing space in command
 nmap <leader>f   :Rg  <BS>
 xmap <leader>f   y:Rg <C-R>=escape(@",'/\')<CR>

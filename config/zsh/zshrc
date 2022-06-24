@@ -111,6 +111,11 @@ alias j8="export JAVA_HOME=`/usr/libexec/java_home -v 1.8`; java -version"
 # View image
 alias icat="kitty +kitten icat"
 
+# Use Nvim
+alias vim="nvim"
+alias vi="nvim"
+export EDITOR="nvim"
+
 export PATH="/usr/local/opt/ruby/bin:$PATH"
 
 # Opam configuration
