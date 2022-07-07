@@ -37,7 +37,8 @@ set list
 set listchars=tab:•\ ,trail:▫
 
 " Show line numbers
-set number
+" set number
+set number relativenumber
 
 " Show where you are
 set ruler
@@ -506,8 +507,7 @@ cnoremap <C-j> <Down>
 " Functions
 nnoremap <leader>d :NERDTreeToggle<CR>
 " nnoremap <leader>f :NERDTreeFind<CR>
-nnoremap <leader>n :call StripTrailing()<CR>
-nnoremap <leader>s :noh<CR>
+nnoremap <leader>s :noh <bar> call StripTrailing() <CR>
 " nnoremap <leader>a :Ag<space>
 
 " Tabs
