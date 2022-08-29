@@ -125,7 +125,15 @@ let g:startify_bookmarks = [
     \ {'z': '~/.zshrc'},
     \ ]
 
-" Go to specific line&col. I'd love it be built-in.
+" Note taking
+Plug 'vimwiki/vimwiki'
+let g:vimwiki_list = [{
+    \ 'path': '~/notes/',
+    \ 'syntax': 'markdown',
+    \ 'ext': '.md',
+    \ }]
+
+" Go to specific line&col
 Plug 'wsdjeg/vim-fetch'
 
 " Git
@@ -168,11 +176,13 @@ let g:NERDSpaceDelims            = 1
 let g:NERDTrimTrailingWhitespace = 1
 let g:NERDToggleCheckAllLines    = 1
 let g:NERDCreateDefaultMappings  = 0 " No default key mapping
+let g:NERDCustomDelimiters = { 'asm': { 'left': '//' } }
 
 " Auto closing
 Plug 'jiangmiao/auto-pairs'
 au FileType rust     let b:AutoPairs = AutoPairsDefine({'\w\zs<': '>'}) | call AutoPairsTryInit() | call AutoPairsInit()
-let g:AutoPairsShortcutFastWrap = '<A-f>'
+let g:AutoPairsShortcutFastWrap = '<C-f>'
+
 " <M-p> : Toggle Autopairs
 " <M-b> : BackInsert
 
@@ -274,7 +284,6 @@ endfunction
 nmap <silent> <leader>j :call Cj()<CR>
 nmap <silent> <leader>k :call Ck()<CR>
 
-
 " Change root to git working dir, excluding (default) Makefile
 Plug 'airblade/vim-rooter'
 let g:rooter_patterns = ['.git', '_darcs', '.hg', '.bzr', '.svn']
@@ -297,7 +306,6 @@ xmap <leader>f   y:Rg <C-R>=escape(@",'/\')<CR>
 nmap <leader>m   :Marks<CR>
 " nmap <leader>r   :Tags<CR>
 " nmap <leader>kr  :BTags<CR>
-
 
 call plug#end()
 
@@ -465,7 +473,7 @@ lua << EOF
 
     require'nvim-treesitter.configs'.setup {
         -- A list of parser names, or "all"
-        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml"},
+        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml", "markdown"},
 
         -- Install parsers synchronously (only applied to `ensure_installed`)
         sync_install = false,

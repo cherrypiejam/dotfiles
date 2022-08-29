@@ -1,5 +1,5 @@
 # open terminal
-cmd - return : /Applications/Kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null
+cmd - return : arch -arm64 /Applications/Kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null
 # shift + cmd - return : /Applications/Kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null &&\
     # yabai -m window --toggle float && yabai -m window --grid 4:4:1:1:2:2
 

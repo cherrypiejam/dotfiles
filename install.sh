@@ -41,11 +41,16 @@ function main() {
     if [ "$(uname)" == "Darwin" ]; then
         yabai_conf
         skhd_conf
+        kitty_conf
     fi
     nvim_conf
     tmux_conf
     zsh_conf
-    kitty_conf
 }
 
-main
+if [ "$1" == "nvim" ]; then
+    nvim_conf
+else
+    # Gimme all
+    main
+fi
