@@ -460,7 +460,7 @@ lua << EOF
 
     -- Setup lspconfig.
     local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-    local servers = { 'clangd', 'rust_analyzer', 'pyright' }
+    local servers = { 'clangd', 'rust_analyzer', 'pyright', 'tsserver'}
     for _, lsp in ipairs(servers) do
         nvim_lsp[lsp].setup {
             capabilities = capabilities,
@@ -473,7 +473,7 @@ lua << EOF
 
     require'nvim-treesitter.configs'.setup {
         -- A list of parser names, or "all"
-        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml", "markdown"},
+        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml", "markdown", "typescript"},
 
         -- Install parsers synchronously (only applied to `ensure_installed`)
         sync_install = false,
