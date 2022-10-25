@@ -326,10 +326,17 @@ hi link LspDiagnosticsDefaultError    Error
 hi link LspDiagnosticsDefaultWarning  Question
 
 lua << EOF
-    local nvim_lsp = require('lspconfig')
-    -- local nvim_complete = require('completion')
-    -- require('lspfuzzy').setup{}
+    function formatText()
+        -- local _, ls, _ , _ = unpack(vim.fn.getpos("'<"))
+        -- local _, le, _ , _ = unpack(vim.fn.getpos("'>"))
+        -- local a = vim.api.nvim_buf_get_lines(0, ls-1, le, false)
+        -- print(vim.inspect(a))
+        print("todo!")
+    end
+    vim.keymap.set('x', '<leader>wf', formatText, {})
 
+    -- Setup lspfuzzy
+    local nvim_lsp = require('lspconfig')
     require('lspfuzzy').setup {
         methods = 'all',         -- either 'all' or a list of LSP methods (see below)
         jump_one = true,         -- jump immediately if there is only one location
@@ -397,9 +404,8 @@ lua << EOF
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
     end
 
-    -- Setup nvim-cmp.
-    local cmp = require'cmp'
-
+    -- Setup nvim-cmp
+    local cmp = require('cmp')
     cmp.setup({
         snippet = {
             -- REQUIRED - you must specify a snippet engine
@@ -471,6 +477,7 @@ lua << EOF
         }
     end
 
+    -- Setup tree-sitter
     require'nvim-treesitter.configs'.setup {
         -- A list of parser names, or "all"
         ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml", "markdown", "typescript"},
