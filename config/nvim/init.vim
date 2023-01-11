@@ -104,7 +104,6 @@ Plug 'marko-cerovac/material.nvim'
 let g:material_style = "palenight"
 let g:material_terminal_italics = 1
 
-
 " Status line
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -465,8 +464,12 @@ lua << EOF
     })
 
     -- Setup lspconfig.
-    local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-    local servers = { 'clangd', 'rust_analyzer', 'pyright', 'tsserver'}
+    local capabilities = require('cmp_nvim_lsp')
+        .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local servers = {
+        'clangd', 'rust_analyzer', 'hls',
+        'gopls', 'pyright', 'tsserver',
+    }
     for _, lsp in ipairs(servers) do
         nvim_lsp[lsp].setup {
             capabilities = capabilities,
@@ -480,7 +483,13 @@ lua << EOF
     -- Setup tree-sitter
     require'nvim-treesitter.configs'.setup {
         -- A list of parser names, or "all"
-        ensure_installed = { "c", "cpp", "rust", "python", "latex", "bash", "comment", "cmake", "make", "toml", "markdown", "typescript"},
+        ensure_installed = {
+            "c", "cpp",
+            "rust", "go", "haskell",
+            "bash", "python", "typescript",
+            "cmake", "make", "toml", "nix",
+            "latex", "markdown", "comment",
+        },
 
         -- Install parsers synchronously (only applied to `ensure_installed`)
         sync_install = false,

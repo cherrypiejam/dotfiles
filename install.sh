@@ -19,8 +19,8 @@ function nvim_conf() {
     # I also want it to be shared with fallback vim
     ln -s $UPATH/config/nvim/init.vim ~/.vimrc
     # Install vim-plugged, need to run `nvim +PlugInstall` manually
-    # sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-        # https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 }
 
 # Tmux
