@@ -10,7 +10,9 @@ export ZSH="/Users/cherrypie/.oh-my-zsh"
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="agnoster"
 # ZSH_THEME="bureau"
-ZSH_THEME="strug"
+# ZSH_THEME="strug"
+# ZSH_THEME="random"
+ZSH_THEME="sammy"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -121,6 +123,7 @@ export EDITOR="nvim"
 alias python="/usr/local/bin/python3"
 
 export PATH="/usr/local/opt/ruby/bin:$PATH"
+# export PATH="/run/current-system/sw/bin:$PATH"
 
 # Opam configuration
 test -r /Users/cherrypie/.opam/opam-init/init.zsh && . /Users/cherrypie/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true

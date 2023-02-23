@@ -55,6 +55,7 @@ cmd + alt - n : yabai -m space --create && \
 cmd + alt - w : yabai -m space --destroy
 
 # fast focus desktop
+cmd + alt - a : yabai -m display --focus recent
 cmd + alt - x : yabai -m space --focus recent
 cmd + alt - z : yabai -m space --focus prev
 cmd + alt - c : yabai -m space --focus next
@@ -68,6 +69,7 @@ cmd + alt - 7 : yabai -m space --focus  7
 cmd + alt - 8 : yabai -m space --focus  8
 cmd + alt - 9 : yabai -m space --focus  9
 cmd + alt - 0 : yabai -m space --focus 10
+
 # preserve key combines for sorting
 # cmd + alt - z : yabai -m space --focus prev || skhd -k "ctrl + alt + cmd - z"
 # cmd + alt - c : yabai -m space --focus next || skhd -k "ctrl + alt + cmd - c"

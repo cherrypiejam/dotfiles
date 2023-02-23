@@ -132,6 +132,15 @@ let g:vimwiki_list = [{
     \ 'ext': '.md',
     \ }]
 
+" Writing
+Plug 'junegunn/goyo.vim'
+nnoremap <leader>g :Goyo<CR>
+au BufReadPost,BufNewFile *    :Goyo!
+au BufReadPost,BufNewFile *.md :Goyo
+Plug 'junegunn/limelight.vim'
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+
 " Go to specific line&col
 Plug 'wsdjeg/vim-fetch'
 
@@ -159,12 +168,17 @@ nnoremap <leader>t :TagbarToggle<CR>
 " let g:snipMate = { 'snippet_version' : 1 }
 
 " Nerdtree
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-let g:NERDSpaceDelims=1
-Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight', { 'on': 'NERDTreeToggle' }
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+if has('nvim')
+    Plug 'nvim-tree/nvim-web-devicons'
+    Plug 'nvim-tree/nvim-tree.lua'
+else
+    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+    let g:NERDSpaceDelims=1
+    Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
+    Plug 'tiagofumo/vim-nerdtree-syntax-highlight', { 'on': 'NERDTreeToggle' }
+    autocmd StdinReadPre * let s:std_in=1
+    autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+endif
 
 " Commentary
 " Plug 'tpope/vim-commentary'
@@ -179,7 +193,7 @@ let g:NERDCustomDelimiters = { 'asm': { 'left': '//' } }
 
 " Auto closing
 Plug 'jiangmiao/auto-pairs'
-au FileType rust     let b:AutoPairs = AutoPairsDefine({'\w\zs<': '>'}) | call AutoPairsTryInit() | call AutoPairsInit()
+au FileType rust     let b:AutoPairs = AutoPairsDefine({'::\zs<': '>'})
 let g:AutoPairsShortcutFastWrap = '<C-f>'
 
 " <M-p> : Toggle Autopairs
@@ -325,6 +339,15 @@ hi link LspDiagnosticsDefaultError    Error
 hi link LspDiagnosticsDefaultWarning  Question
 
 lua << EOF
+
+    -- Setup nvim-tree
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+    -- set termguicolors to enable highlight groups
+    vim.opt.termguicolors = true
+    -- empty setup using defaults
+    require("nvim-tree").setup()
+
     function formatText()
         -- local _, ls, _ , _ = unpack(vim.fn.getpos("'<"))
         -- local _, le, _ , _ = unpack(vim.fn.getpos("'>"))
@@ -337,20 +360,20 @@ lua << EOF
     -- Setup lspfuzzy
     local nvim_lsp = require('lspconfig')
     require('lspfuzzy').setup {
-        methods = 'all',         -- either 'all' or a list of LSP methods (see below)
-        jump_one = true,         -- jump immediately if there is only one location
-        save_last = false,       -- save last location results for the :LspFuzzyLast command
-        callback = nil,          -- callback called after jumping to a location
-        fzf_preview = {          -- arguments to the FZF '--preview-window' option
-            'right:+{2}-/2'          -- preview on the right and centered on entry
+        methods = 'all',               -- either 'all' or a list of LSP methods (see below)
+        jump_one = true,               -- jump immediately if there is only one location
+        save_last = false,             -- save last location results for the :LspFuzzyLast command
+        callback = nil,                -- callback called after jumping to a location
+        fzf_preview = {                -- arguments to the FZF '--preview-window' option
+            'right:+{2}-/2'            -- preview on the right and centered on entry
         },
-        fzf_action = {               -- FZF actions
+        fzf_action = {                 -- FZF actions
             ['ctrl-t'] = 'tab split',  -- go to location in a new tab
             ['ctrl-v'] = 'vsplit',     -- go to location in a vertical split
             ['ctrl-x'] = 'split',      -- go to location in a horizontal split
         },
-        fzf_modifier = ':~:.',   -- format FZF entries, see |filename-modifiers|
-        fzf_trim = true,         -- trim FZF entries
+        fzf_modifier = ':~:.',         -- format FZF entries, see |filename-modifiers|
+        fzf_trim = true,               -- trim FZF entries
     }
 
     -- Mappings.
@@ -465,7 +488,7 @@ lua << EOF
 
     -- Setup lspconfig.
     local capabilities = require('cmp_nvim_lsp')
-        .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+        .default_capabilities(vim.lsp.protocol.make_client_capabilities())
     local servers = {
         'clangd', 'rust_analyzer', 'hls',
         'gopls', 'pyright', 'tsserver',
@@ -482,33 +505,29 @@ lua << EOF
 
     -- Setup tree-sitter
     require'nvim-treesitter.configs'.setup {
-        -- A list of parser names, or "all"
         ensure_installed = {
-            "c", "cpp",
-            "rust", "go", "haskell",
-            "bash", "python", "typescript",
+            "bash", "fish",
+            "c", "cpp", "rust", "haskell", "go",
+            "python", "typescript", "vim",
             "cmake", "make", "toml", "nix",
             "latex", "markdown", "comment",
         },
-
-        -- Install parsers synchronously (only applied to `ensure_installed`)
         sync_install = false,
-
-        -- List of parsers to ignore installing (for "all")
-        -- ignore_install = { "javascript" },
-
         highlight = {
-            -- `false` will disable the whole extension
             enable = true,
-
-            -- list of language that will be disabled
             -- disable = { "c", "rust" },
-
-            -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-            -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
             additional_vim_regex_highlighting = false,
         },
     }
+
+    -- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+    -- parser_config.elixir = {
+    --     install_info = {
+    --         url = "https://github.com/wingyplus/tree-sitter-elixir",
+    --         files = { 'src/parser.c', 'src/scanner.cc' },
+    --         branch = "main"
+    --     }
+    -- }
 
 EOF
 
@@ -529,7 +548,11 @@ cnoremap <C-k> <Up>
 cnoremap <C-j> <Down>
 
 " Functions
-nnoremap <leader>d :NERDTreeToggle<CR>
+if has("nvim")
+    nnoremap <leader>d :NvimTreeToggle<CR>
+else
+    nnoremap <leader>d :NERDTreeToggle<CR>
+end
 " nnoremap <leader>f :NERDTreeFind<CR>
 nnoremap <leader>s :noh <bar> call StripTrailing() <CR>
 " nnoremap <leader>a :Ag<space>
