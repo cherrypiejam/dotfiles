@@ -121,7 +121,7 @@ Plug 'mhinz/vim-startify'
 let g:startify_session_persistence = 1
 let g:startify_bookmarks = [
     \ {'c': '~/.config/nvim/init.vim'},
-    \ {'z': '~/.zshrc'},
+    \ {'f': '~/.config/fish/config.fish'},
     \ ]
 
 " Note taking
@@ -510,7 +510,7 @@ lua << EOF
             "c", "cpp", "rust", "haskell", "go",
             "python", "typescript", "vim",
             "cmake", "make", "toml", "nix",
-            "latex", "markdown", "comment",
+            "latex", "markdown", "markdown_inline", "comment",
         },
         sync_install = false,
         highlight = {
@@ -519,16 +519,6 @@ lua << EOF
             additional_vim_regex_highlighting = false,
         },
     }
-
-    -- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-    -- parser_config.elixir = {
-    --     install_info = {
-    --         url = "https://github.com/wingyplus/tree-sitter-elixir",
-    --         files = { 'src/parser.c', 'src/scanner.cc' },
-    --         branch = "main"
-    --     }
-    -- }
-
 EOF
 
 endif
