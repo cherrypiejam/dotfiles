@@ -33,11 +33,9 @@ set laststatus=2
 
 " Show trailing whitespace
 set list
-" set listchars=tab:▸\ ,trail:▫
 set listchars=tab:•\ ,trail:▫
 
 " Show line numbers
-" set number
 set number relativenumber
 
 " Show where you are
@@ -55,7 +53,6 @@ set showcmd
 " set wildmode=longest,list,full
 
 " Enable spell-check
-" set spell spelllang=en_us
 au FileType *tex,markdown,text,gitcommit setlocal spell spelllang=en_us,cjk
 
 " When split, split to the bottom right
@@ -93,18 +90,18 @@ endif
 " in case you forgot to sudo
 cnoremap w!! %!sudo tee > /dev/null %
 
-" if has('nvim')
-" endif
 
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Color theme
 Plug 'marko-cerovac/material.nvim'
-" let g:material_style = "deep ocean"
 let g:material_style = "palenight"
 let g:material_terminal_italics = 1
 
 " Status line
+" if has('nvim')
+    " Plug 'nvim-lualine/lualine.nvim'
+" else
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 let g:airline#extensions#tabline#enabled      = 1
@@ -115,6 +112,7 @@ let g:airline#extensions#branch#enabled       = 1
 let g:airline#extensions#tabline#ignore_bujfadd_pat =
     \ '!|defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
 let g:airline_theme = 'base16_material_palenight'
+" endif
 
 " Start screen
 Plug 'mhinz/vim-startify'
@@ -181,7 +179,6 @@ else
 endif
 
 " Commentary
-" Plug 'tpope/vim-commentary'
 Plug 'scrooloose/nerdcommenter'
 nnoremap <leader><space> :call nerdcommenter#Comment(0, "toggle")<CR>
 vnoremap <leader><space> :call nerdcommenter#Comment(0, "toggle")<CR>gv
@@ -227,6 +224,11 @@ Plug 'vim-scripts/greplace.vim'
 " Code highlighting
 if has('nvim')
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+endif
+
+" Org Mode
+if has('nvim')
+    Plug 'nvim-orgmode/orgmode'
 endif
 
 " LSP support
@@ -333,8 +335,6 @@ set completeopt=menu,menuone,noselect
 " LSP settings
 if has('nvim')
 
-" I wanted a red sign for error and a blue sign for warning. In the material
-" theme we could use `Question` for blue.
 hi link LspDiagnosticsDefaultError    Error
 hi link LspDiagnosticsDefaultWarning  Question
 
@@ -456,6 +456,8 @@ lua << EOF
             { name = 'vsnip' },
         }, {
             { name = 'buffer' },
+        }, {
+            { name = 'orgmode' },
         })
     })
 
@@ -490,8 +492,12 @@ lua << EOF
     local capabilities = require('cmp_nvim_lsp')
         .default_capabilities(vim.lsp.protocol.make_client_capabilities())
     local servers = {
-        'clangd', 'rust_analyzer', 'hls',
-        'gopls', 'pyright', 'tsserver',
+        'clangd',
+        'rust_analyzer',
+        'hls',
+        'gopls',
+        'pyright',
+        'tsserver',
     }
     for _, lsp in ipairs(servers) do
         nvim_lsp[lsp].setup {
@@ -503,22 +509,48 @@ lua << EOF
         }
     end
 
+    -- Load custom treesitter grammar for org filetype
+    require('orgmode').setup_ts_grammar()
+
     -- Setup tree-sitter
-    require'nvim-treesitter.configs'.setup {
+    require('nvim-treesitter.configs').setup {
         ensure_installed = {
-            "bash", "fish",
-            "c", "cpp", "rust", "haskell", "go",
-            "python", "typescript", "vim",
-            "cmake", "make", "toml", "nix",
-            "latex", "markdown", "markdown_inline", "comment",
+            "bash",
+            "fish",
+            "c",
+            "cpp",
+            "rust",
+            "haskell",
+            "go",
+            "python",
+            "typescript",
+            "vim",
+            "vimdoc",
+            "query",
+            "cmake",
+            "make",
+            "toml",
+            "nix",
+            "latex",
+            "markdown",
+            "markdown_inline",
+            "comment",
+            "org",
+            "html",
         },
         sync_install = false,
         highlight = {
             enable = true,
-            -- disable = { "c", "rust" },
-            additional_vim_regex_highlighting = false,
+            additional_vim_regex_highlighting = { "org" },
         },
     }
+    require('nvim-treesitter.install').compilers = { "gcc-11" }
+
+    require('orgmode').setup({
+        org_agenda_files = { '~/orgs/*' },
+        org_default_notes_file = '~/orgs/default.org',
+    })
+
 EOF
 
 endif
@@ -555,12 +587,6 @@ nnoremap <C-t>    :tabnew<CR>
 inoremap <S-tab>  <Esc>:tabprevious<CR>i
 inoremap <C-q>    <Esc>:tabnext<CR>i
 inoremap <C-t>    <Esc>:tabnew<CR>
-
-" nnoremap <S-tab>   :tabprevious<CR>
-" nnoremap <C-S-tab>   :tabnext<CR>
-" inoremap <C-S-tab> <Esc>:tabprevious<CR>i
-" inoremap <C-tab>   <Esc>:tabnext<CR>i
-" inoremap <C-t>     <Esc>:tabnew<CR>
 
 " Buffers
 nnoremap <leader>bt :enew<CR>
