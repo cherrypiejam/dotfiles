@@ -19,7 +19,6 @@ if not set -q SPPID; \
     for i in (seq 1 500)
         set SPID (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .id")
         if test -n "$SPID"
-            echo hahaha $i
             break
         end
     end
@@ -37,6 +36,7 @@ else
     set SPID (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .id")
     set SP_ISMINIMIZED (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"is-minimized\"")
     set SP_ISFLOATING (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"is-floating\"")
+    set SP_SPACE (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"space\"")
     set CURRENT_SPACE (yabai -m query --spaces --space | jq '.index')
 
     if test $SP_ISFLOATING = 'false'
@@ -50,8 +50,14 @@ else
             --focus $SPID          \
             --grid 4:4:1:1:2:2
     else
-        yabai -m window            \
-            --minimize $SPID       \
-            --focus (yabai -m query --windows --space | jq --slurp '.[] | .[1].id')
+        if test $CURRENT_SPACE = $SP_SPACE
+            yabai -m window        \
+                --minimize $SPID   \
+                --focus (yabai -m query --windows --space | jq --slurp '.[] | .[1].id')
+        else
+            yabai -m window $SPID      \
+                --space $CURRENT_SPACE \
+                --focus $SPID
+        end
     end
 end
