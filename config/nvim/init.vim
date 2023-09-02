@@ -498,6 +498,7 @@ lua << EOF
         'gopls',
         'pyright',
         'tsserver',
+        'elmls',
     }
     for _, lsp in ipairs(servers) do
         nvim_lsp[lsp].setup {
