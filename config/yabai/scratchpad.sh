@@ -1,6 +1,7 @@
 #!/usr/bin/env fish
 
 set SP /tmp/SCRATCHPAD
+set GRID 4:4:1:2:2:2
 
 if test -e $SP
     cat $SP | read SPPID
@@ -28,7 +29,7 @@ if not set -q SPPID; \
     end
 
     yabai -m window $SPID --toggle float
-    yabai -m window $SPID --grid 4:4:1:1:2:2
+    yabai -m window $SPID --grid $GRID
 
     echo $SPPID > $SP
 
@@ -48,7 +49,7 @@ else
             --space $CURRENT_SPACE \
             --deminimize $SPID     \
             --focus $SPID          \
-            --grid 4:4:1:1:2:2
+            --grid $GRID
     else
         if test $CURRENT_SPACE = $SP_SPACE
             yabai -m window        \
