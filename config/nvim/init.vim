@@ -91,12 +91,21 @@ endif
 cnoremap w!! %!sudo tee > /dev/null %
 
 
-call plug#begin('~/.local/share/nvim/plugged')
+if has('nvim')
+    call plug#begin('~/.local/share/nvim/plugged')
+else
+    call plug#begin()
+endif
 
 " Color theme
-Plug 'marko-cerovac/material.nvim'
-let g:material_style = "palenight"
-let g:material_terminal_italics = 1
+if has('nvim')
+    Plug 'marko-cerovac/material.nvim'
+    let g:material_style = "palenight"
+    let g:material_terminal_italics = 1
+else
+    Plug 'drewtempelmeyer/palenight.vim'
+    let g:palenight_terminal_italics = 1
+endif
 
 " Status line
 " if has('nvim')
@@ -327,9 +336,19 @@ call plug#end()
 
 " Color theme
 set background=dark
-colorscheme material
+if has('nvim')
+    colorscheme material
+else
+    if has('termguicolors')
+        set termguicolors
+    endif
+    " Fix RGB colors for Vim
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+    let g:palenight_termcolors=16
+    colorscheme palenight
+endif
 
-" set completeopt=menuone,noinsert,noselect
 set completeopt=menu,menuone,noselect
 
 " LSP settings
@@ -343,9 +362,7 @@ lua << EOF
     -- Setup nvim-tree
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
-    -- set termguicolors to enable highlight groups
-    vim.opt.termguicolors = true
-    -- empty setup using defaults
+    vim.opt.termguicolors = true -- enable highlight groups
     require("nvim-tree").setup()
 
     function formatText()
@@ -575,7 +592,7 @@ if has("nvim")
     nnoremap <leader>d :NvimTreeToggle<CR>
 else
     nnoremap <leader>d :NERDTreeToggle<CR>
-end
+endif
 " nnoremap <leader>f :NERDTreeFind<CR>
 nnoremap <leader>s :noh <bar> call StripTrailing() <CR>
 " nnoremap <leader>a :Ag<space>
@@ -672,21 +689,6 @@ autocmd BufNewFile *.{h,hpp} call <SID>insert_gates()
 "     echo "Text Wrapping On"
 "   endif
 " endfunction
-
-
-" Toggle background
-" function! ToggleBG()
-  " let s:tbg = &background
-  " " Inversion
-  " if s:tbg == "dark"
-      " set background=light
-      " let g:material_style = "deep ocean"
-  " else
-      " set background=dark
-      " let g:material_style = "palenight"
-  " endif
-" endfunction
-" noremap <leader>bg :call ToggleBG()<CR>
 
 
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
