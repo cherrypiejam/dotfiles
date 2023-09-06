@@ -37,6 +37,7 @@ else
     set SPID (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .id")
     set SP_ISMINIMIZED (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"is-minimized\"")
     set SP_ISFLOATING (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"is-floating\"")
+    set SP_HASFOCUS (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"has-focus\"")
     set SP_SPACE (yabai -m query --windows | jq ".[] | select(.pid==$SPPID) | .\"space\"")
     set CURRENT_SPACE (yabai -m query --spaces --space | jq '.index')
 
@@ -51,10 +52,12 @@ else
             --focus $SPID          \
             --grid $GRID
     else
-        if test $CURRENT_SPACE = $SP_SPACE
+        if test $CURRENT_SPACE = $SP_SPACE; and test $SP_HASFOCUS = 'true'
             yabai -m window        \
                 --minimize $SPID   \
                 --focus (yabai -m query --windows --space | jq --slurp '.[] | .[1].id')
+        else if test $CURRENT_SPACE = $SP_SPACE
+            yabai -m window $SPID --focus $SPID
         else
             yabai -m window $SPID      \
                 --space $CURRENT_SPACE \
